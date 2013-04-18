@@ -2,19 +2,8 @@
 
 import win32api
 import time
+import ast
 
-try:
-    #attempts to load current roladex file
-    file = open("C:/Users/" + win32api.GetUserName() + "/Desktop/RoladexFile.txt", 'r')
-    Contents = file.readlines()
-    CurrentDex = []
-    #Need better file reader :(
-    #for item in Contents:
-        #CurrentDex.append(ImportCard(item))
-    file.close()
-except FileNotFoundError:
-    #Creates array if no file found
-    CurrentDex = []
 
 class BusinessCard(object):
     #The main class, a pain, but simple
@@ -130,11 +119,31 @@ def SaveData():
     while i < len(CurrentDex):
         #print(vars(CurrentDex[i]))
         time.sleep(.02)
-        file.writelines(str(vars(CurrentDex[i])))
+        file.writelines(str(vars(CurrentDex[i])) + "\n")
         i += 1
     file.close()
 
+def Search(terms, criteria):
+    #this will do the actual searching
+    pass
+
+
+def SearchCards():
+    #This is going to handle setting up card searches.
+    pass
+
+
+def BrowseCards():
+    #This will bring the cards up sorted by different methods
+    pass
+
+def ModifyCard(object):
+    #Because sometimes they get entered wrongly
+    pass
+
 def MainMenu():
+    #This is the main menu, you can create, find, or (later) modify cards from here
+    #Exiting here exits the program
     while True:
         print("\n" * 200)
         print("MAIN MENU:")
@@ -149,7 +158,7 @@ def MainMenu():
                 CreateCard()
         for item in [str(2), "SEAR", "TWO"]:
             if item in response.upper():
-                SearchCard() #Make this
+                SearchCards() #Make this
         for item in [str(3), "BROW", "THREE"]:
             if item in response.upper():
                 BrowseCards() #Make this
@@ -157,10 +166,43 @@ def MainMenu():
             return False
 
 
-#Need a user interface here
+#This is the file boot up
+try:
+    #The save and load functions WORKS!!
+    file = open("C:/Users/" + win32api.GetUserName() + "/Desktop/RoladexFile.txt", 'r')
+    Contents = file.readlines()
+    CurrentDex = []
+    i = 0
+    classobject = ""
+    while i < len(Contents):
+        print("There are " + str(len(Contents)) + " items")
+        j = 0
+        while j < len(Contents[i]):
+            if Contents[i][j] != "\n":
+                classobject += Contents[i][j]
+            else:
+                print("Found " + str(i + 1))
+                CurrentDex.append(ImportCard(ast.literal_eval(classobject)))
+                classobject = ""
+            j += 1
+        i += 1
+            
+    file.close()
+    print("File found")
+    print(CurrentDex)
+    time.sleep(2)
+except FileNotFoundError:
+    #Creates array if no file found
+    print("couldn't find")
+    time.sleep(2)
+    CurrentDex = []
+
+
+
+#Version info
 print("CardSmarts version 0.5 by Robert Rodriguez 4/15/2013\nReleased xx/xx/xxxx")
 time.sleep(2)
-
+#Main program loop (it's tiny!)
 while True:
     if MainMenu() == False:
         break
