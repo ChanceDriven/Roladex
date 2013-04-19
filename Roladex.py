@@ -119,26 +119,59 @@ def SaveData():
     while i < len(CurrentDex):
         #print(vars(CurrentDex[i]))
         time.sleep(.02)
-        file.writelines(str(vars(CurrentDex[i])) + "\n")
+        file.writelines(str(vars(CurrentDex[i])) + "\n" * 3)
         i += 1
     file.close()
 
-def Search(terms, criteria):
+def Search(terms):
     #this will do the actual searching
-    pass
+    termArray = []
+    term = ""
 
+    #This loop creates a string (term) and fills it with words or numbers (spaces deliminate) then passes
+    #them to termArray for storage
+    terms += " "
+    for character in terms:
+        if character == " ":
+            termArray.append(term)
+            term = ""
+        else:
+            term += character
+
+    #The results array will list the indicies of matching cards
+    i = 0
+    results = []
+    for item in CurrentDex:
+        for term in termArray:
+            if term in vars(item).values():
+                results.append(i)
+        i += 1
+
+    print("\n" * 50)
+    if results == []: #no results
+        input("No results were found")
+        return 0
+    
+    i = 0
+    for result in results:
+        print(str(i) + ". " + CurrentDex[i].firstname + " " + CurrentDex[i].lastname )
+        i += 1
+    selection = int(input("Which result number would you like to view?\n>>> "))
+    if selection in results:
+        PrintCard(CurrentDex[selection])
+    input("Press enter to continue")
 
 def SearchCards():
     #This is going to handle setting up card searches.
-    pass
+    print("\n" * 50)
+    Search(input("Please enter your search term:\n>>> "))
 
-
-def BrowseCards():
+def BrowseCards(SortBy):
     #This will bring the cards up sorted by different methods
-    pass
+    SortedDex = sorted(CurrentDex, key = lambda k: k[SortBy])
 
 def ModifyCard(object):
-    #Because sometimes they get entered wrongly
+    #Because sometimes they get entered incorrectly
     pass
 
 def MainMenu():
@@ -175,25 +208,20 @@ try:
     i = 0
     classobject = ""
     while i < len(Contents):
-        print("There are " + str(len(Contents)) + " items")
         j = 0
         while j < len(Contents[i]):
             if Contents[i][j] != "\n":
                 classobject += Contents[i][j]
             else:
-                print("Found " + str(i + 1))
                 CurrentDex.append(ImportCard(ast.literal_eval(classobject)))
                 classobject = ""
             j += 1
         i += 1
             
     file.close()
-    print("File found")
-    print(CurrentDex)
-    time.sleep(2)
 except FileNotFoundError:
     #Creates array if no file found
-    print("couldn't find")
+    print("Couldn't find file")
     time.sleep(2)
     CurrentDex = []
 
