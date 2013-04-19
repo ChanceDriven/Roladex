@@ -156,10 +156,13 @@ def Search(terms):
     for result in results:
         print(str(i) + ". " + CurrentDex[i].firstname + " " + CurrentDex[i].lastname )
         i += 1
-    selection = int(input("Which result number would you like to view?\n>>> "))
-    if selection in results:
-        PrintCard(CurrentDex[selection])
-    input("Press enter to continue")
+    try:
+        selection = int(input("Which result number would you like to view?\n>>> "))
+        if selection in results:
+            PrintCard(CurrentDex[selection])
+        input("Press enter to continue")
+    except ValueError:
+        pass
 
 def SearchCards():
     #This is going to handle setting up card searches.
