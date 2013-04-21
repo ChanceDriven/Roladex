@@ -119,7 +119,7 @@ def SaveData():
     while i < len(CurrentDex):
         #print(vars(CurrentDex[i]))
         time.sleep(.02)
-        file.writelines(str(vars(CurrentDex[i])) + "\n" * 3)
+        file.writelines(str(vars(CurrentDex[i])) + "\n")
         i += 1
     file.close()
 
