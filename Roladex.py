@@ -104,13 +104,60 @@ def CreateCard():
 def PrintCard(data):
     #This will be the program for printing the cards to the screen
     #Curently this is a crappy system
-    line1 = " " + "_" * 58 + "\n"
-    line2 = "| " + data.companyname + " " * (57-len(data.companyname)) + "|" + "\n"
-    line3 = "| " + data.company2 + " " * (57 - len(data.company2)) + "|" + "\n"
-    lines = "|" + " " * 58 + "|" + "\n"
-    linel = "|" + "_" * 58 + "|"
+
+    #There will be 3 information blocks
+    datablock1 = []
+    if data.companyname != "":
+        datablock1.append(data.companyname)
+    if data.company2 != "":
+        datablock1.append(data.company2)
+
+    datablock2 = [] #this block needs to handle name spacing better
+    if data.firstname != "" or data.middlename != "" or data.lastname != "":
+        datablock2.append(data.firstname + " " + data.middlename + " " + data.lastname)
+    if data.title != "":
+        datablock2.append(data.title)
+    if data.website != "":
+        datablock2.append(data.website)
+
+
+    datablock3 = [] #Needs better number formatting in case of funky numbers
+    if data.address1 != "":
+        datablock3.append(data.address1)
+    if data.address2 != "":
+        datablock3.append(data.address2)
+    if data.address3 != "":
+        datablock3.append(data.address3)
+    if data.phone != "":
+        datablock3.append("P: (" + data.phone[0:3] + ") " + data.phone[3:6] + "-" + data.phone[6:])
+    if data.mobile != "":
+        datablock3.append("M: (" + data.mobile[0:3] + ") " + data.mobile[3:6] + "-" + data.mobile[6:])
+    if data.fax != "":
+        datablock3.append("F: (" + data.fax[0:3] + ") " + data.fax[3:6] + "-" + data.fax[6:])
+    if data.othernumber != "":
+        datablock3.append("O: (" + data.othernumber[0:3] + ") " + data.othernumber[3:6] + "-" + data.othernumber[6:])
+    if data.email != "":
+        datablock3.append(data.email)
+    
+    #this assembles the card
+    printedcard = []
+    printedcard.append(" " + "_" * 58)
+    i = 0
+    while i < len(datablock1):
+        printedcard.append( "| " + datablock1[i] + " " * (57-len(datablock1[i])) + "|")
+        i += 1
+    bottomlines = max([len(datablock2),len(datablock3)])
+    blanklines = 18 - bottomlines
+    for i in range(blanklines):
+        printedcard.append("|" + " " * 58 + "|")
+    i = 0
+    while i < bottomlines:
+        line = "| " #Need to write in lines only if exist in that block
+        i += 1
+    printedcard.append("|" + "_" * 58 + "|")
     print("\n" * 20)
-    print(line1 + line2 + line3 + lines * 16 + linel)
+    for line in printedcard:
+        print(line)
 
 def SaveData():
     #Will take added cards or modifications and save to the file
@@ -119,7 +166,7 @@ def SaveData():
     while i < len(CurrentDex):
         #print(vars(CurrentDex[i]))
         time.sleep(.02)
-        file.writelines(str(vars(CurrentDex[i])) + "\n")
+        file.writelines(str(vars(CurrentDex[i])) + "\n" * 3)
         i += 1
     file.close()
 
