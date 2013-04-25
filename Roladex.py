@@ -1,8 +1,9 @@
 #My roladex
 
-import win32api
 import time
 import ast
+from random import randint
+import operator
 
 
 class BusinessCard(object):
@@ -32,12 +33,13 @@ class BusinessCard(object):
 
 
 class ImportCard(object):
-    #This class works to grab stored cards and convert them back into a class
+    #This class works to grab stored cards and convert them back into a class object
     def __init__(self, args):
         self.__dict__.update(args)
 
 
 def FillCard():
+    global CurrentDex
     #Horrible, painful block of inputs needed to address all fields
     print("\n" * 50)
     print("Creating a new card")
@@ -95,6 +97,7 @@ def FillCard():
                         mobile, fax, email, website, othernumber, comment)
 
 def CreateCard():
+    global CurrentDex
     #Should call FillCard and save the card.
     CurrentDex.append(FillCard())
     SaveData()
@@ -102,6 +105,7 @@ def CreateCard():
     input("Press enter to continue")
 
 def PrintCard(data):
+    global CurrentDex
     #This will be the program for printing the cards to the screen
     #Curently this is a crappy system
 
@@ -125,7 +129,7 @@ def PrintCard(data):
     if data.address1 != "":
         datablock3.append(data.address1)
     if data.address2 != "":
-        datablock3.append(data.address2)
+        datablock3.append(data.address2 + " " + data.country)
     if data.address3 != "":
         datablock3.append(data.address3)
     if data.phone != "":
@@ -147,30 +151,53 @@ def PrintCard(data):
         printedcard.append( "| " + datablock1[i] + " " * (57-len(datablock1[i])) + "|")
         i += 1
     bottomlines = max([len(datablock2),len(datablock3)])
-    blanklines = 18 - bottomlines
+    blanklines = 18 - bottomlines - len(printedcard)
     for i in range(blanklines):
         printedcard.append("|" + " " * 58 + "|")
-    i = 0
-    while i < bottomlines:
-        line = "| " #Need to write in lines only if exist in that block
-        i += 1
+    i = bottomlines - 1
+    datablock2.reverse()    #This lets the program count down to the bottom edge
+    datablock3.reverse()
+    while i > -1:
+        line = "| "
+        characters = 0
+        try:
+            line += datablock2[i]
+            characters += len(datablock2[i])
+        except IndexError:
+            pass
+        try:
+            characters += len(datablock3[i])
+        except IndexError:
+            pass
+        line += " " * (56 - characters)
+        try:
+            line += datablock3[i]
+        except IndexError:
+            pass
+        line += " |"
+        printedcard.append(line)
+        i -= 1
     printedcard.append("|" + "_" * 58 + "|")
     print("\n" * 20)
     for line in printedcard:
         print(line)
 
+    print("Comments: " + data.comment)
+
 def SaveData():
+    global CurrentDex
     #Will take added cards or modifications and save to the file
-    file = open("C:/Users/" + win32api.GetUserName() + "/Desktop/RoladexFile.txt", 'w')
+    file = open("C:/Roladex/RoladexFile.rpy", 'w')
     i = 0
     while i < len(CurrentDex):
         #print(vars(CurrentDex[i]))
         time.sleep(.02)
-        file.writelines(str(vars(CurrentDex[i])) + "\n" * 3)
+        file.writelines(str(vars(CurrentDex[i])) + "\n")
         i += 1
     file.close()
 
 def Search(terms):
+    global CurrentDex
     #this will do the actual searching
     termArray = []
     term = ""
@@ -198,33 +225,154 @@ def Search(terms):
     if results == []: #no results
         input("No results were found")
         return 0
-    
+
+    #print(results)
+    #print(CurrentDex[results[0]].firstname)
     i = 0
     for result in results:
-        print(str(i) + ". " + CurrentDex[i].firstname + " " + CurrentDex[i].lastname )
+        print(str(i + 1) + ". " + CurrentDex[results[i]].firstname + " " + CurrentDex[results[i]].lastname )
         i += 1
     try:
-        selection = int(input("Which result number would you like to view?\n>>> "))
+        selection = int(input("Which result number would you like to view?\n>>> ")) - 1
         if selection in results:
             PrintCard(CurrentDex[selection])
         input("Press enter to continue")
     except ValueError:
-        pass
+        print("Improper selection")
 
 def SearchCards():
     #This is going to handle setting up card searches.
     print("\n" * 50)
     Search(input("Please enter your search term:\n>>> "))
 
-def BrowseCards(SortBy):
+def BrowseCards():
+    global CurrentDex
     #This will bring the cards up sorted by different methods
-    SortedDex = sorted(CurrentDex, key = lambda k: k[SortBy])
+    print("\n" * 50)
+    sortby = input("What do you want the cards sorted by?\n>>> ")
+    rand = False
+    sortbool = False
+    if "NAME" in sortby.upper():
+        Sort = "lastname"
+        sortbool = True
+    elif "RANDOM" in sortby.upper():
+        rand = True
+        sortbool = True
+    elif "COMPANY" in sortby.upper():
+        Sort = "companyname"
+        sortbool = True
 
-def ModifyCard(object):
+    index = []
+    if rand == False:
+        for i in range(len(CurrentDex)):
+            index.append(i)
+        print(index)
+    else:
+        for item in CurrentDex:
+            while True:     #creates a random non-repeating index
+                i = randint(0, len(CurrentDex) - 1)
+                if not i in index:
+                    index.append(i)
+                    break
+        RandDex = []
+        for i in index:
+           RandDex.append(CurrentDex[i])
+        CurrentDex = RandDex
+    print(index)
+    #After sorting need to display
+    #need to know new index to modify CurrentDex
+    i = 0
+    while i < len(CurrentDex):
+        PrintCard(CurrentDex[index[i]])
+        response = input("Press enter to continue.\n>>> ")
+        if "ACK" in response.upper():
+            if i > 0:
+                i -= 2
+        elif "CHANGE" in response.upper() or "MODIFY" in response.upper():
+            ModifyCard(CurrentDex[index[i]])
+            SaveData()
+        i += 1
+
+def ModifyCard(data):
+    global CurrentDex
     #Because sometimes they get entered incorrectly
-    pass
+
+    while True:         #Loops to allow all needed modifications
+        response = input("What would you like to modify?\n>>> ")
+
+        if "NAME" in response.upper() and not "COMPANY" in response.upper():
+            name = input("What is their first name?\n>>> ")
+            if name != "":
+                data.firstname = name
+            name = input("What is their middle name?\n>>> ")
+            if name != "":
+                data.middlename = name
+            name = input("What is their last name?\n>>> ")
+            if name != "":
+                data.lastname = name
+        elif "TITLE" in response.upper():
+            title = input("What is their title?\n>>> ")
+            if title != "":
+                data.title = title
+        elif "DRESS" in response.upper():
+            address = input("What is the first line of the address?\n>>> ")
+            if address != "":
+                data.address1 = address
+            address = input("What is the second line of the address?\n>>> ")
+            if address != "":
+                data.address2 = address
+            address = input("What is the third line of the address?\n>>> ")
+            if address != "":
+                data.address3 = address
+        elif "COUNTRY" in response.upper():
+            country = input("Which country is the company located in?\n>>> ")
+            if country != "":
+                data.country = country
+        elif "NUMBER" in response.upper() or "PHONE" in response.upper():
+            number = input("What is their phone number?\n>>> ")
+            if number != "":
+                value = ""
+                for i in number:
+                    if i.isdigit():
+                        value += i
+                data.phone = number
+            number = input("What is their mobile number?\n>>> ")
+            if number != "":
+                value = ""
+                for i in number:
+                    if i.isdigit():
+                        value += i
+                data.mobile = number
+            number = input("What is their fax number?\n>>> ")
+            if number != "":
+                value = ""
+                for i in number:
+                    if i.isdigit():
+                        value += i
+                data.fax = number
+            number = input("What is their other phone number?\n>>> ")
+            if number != "":
+                value = ""
+                for i in number:
+                    if i.isdigit():
+                        value += i
+                data.othernumber = number
+        elif "MAIL" in response.upper():
+            email = input("What is their email address?\n>>> ")
+            if email != "":
+                data.email = email
+        elif "SITE" in response.upper():
+            site = input("What is their website?\n>>> ")
+            if site != "":
+                data.website = site
+        elif "XIT" in response.upper():
+            break
+        else:
+            print("Property not recognized.")
+
 
 def MainMenu():
+    global CurrentDex
     #This is the main menu, you can create, find, or (later) modify cards from here
     #Exiting here exits the program
     while True:
@@ -241,10 +389,10 @@ def MainMenu():
                 CreateCard()
         for item in [str(2), "SEAR", "TWO"]:
             if item in response.upper():
-                SearchCards() #Make this
+                SearchCards()
         for item in [str(3), "BROW", "THREE"]:
             if item in response.upper():
-                BrowseCards() #Make this
+                BrowseCards()
         if "EXI" in response.upper():
             return False
 
@@ -252,7 +400,7 @@ def MainMenu():
 #This is the file boot up
 try:
     #The save and load functions WORKS!!
-    file = open("C:/Users/" + win32api.GetUserName() + "/Desktop/RoladexFile.txt", 'r')
+    file = open("C:/Roladex/RoladexFile.rpy", 'r')
     Contents = file.readlines()
     CurrentDex = []
     i = 0
@@ -272,6 +420,8 @@ try:
 except FileNotFoundError:
     #Creates array if no file found
     print("Couldn't find file")
+    file = open("C:/Roladex/RoladexFile.rpy", 'r')
+    file.close()
     time.sleep(2)
     CurrentDex = []
 
