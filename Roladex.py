@@ -521,16 +521,20 @@ try:
     file.close()
 except FileNotFoundError:
     #Creates array if no file found
-    print("Couldn't find file")
-    file = open("C:/Roladex/RoladexFile.rpy", 'w')
-    file.close()
+    print("Couldn't find file.\nFile created.")
+    try:
+        file = open("C:/Roladex/RoladexFile.rpy", 'w')
+        file.close()
+    except FileNotFoundError:
+        import os
+        os.makedirs("C:/Roladex")
     time.sleep(2)
     CurrentDex = []
 
 
 
 #Version info
-print("CardSmarts version 0.5 by Robert Rodriguez 4/15/2013\nReleased xx/xx/xxxx")
+print("\n" * 40 + "CardSmarts version 0.5 by Robert Rodriguez 4/15/2013\nReleased xx/xx/xxxx")
 time.sleep(2)
 #Main program loop (it's tiny!)
 while True:
