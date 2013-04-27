@@ -522,7 +522,7 @@ try:
 except FileNotFoundError:
     #Creates array if no file found
     print("Couldn't find file")
-    file = open("C:/Roladex/RoladexFile.rpy", 'r')
+    file = open("C:/Roladex/RoladexFile.rpy", 'w')
     file.close()
     time.sleep(2)
     CurrentDex = []
