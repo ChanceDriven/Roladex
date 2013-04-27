@@ -245,6 +245,108 @@ def SearchCards():
     print("\n" * 50)
     Search(input("Please enter your search term:\n>>> "))
 
+
+##def PrintPrint(data):
+##    #printing to a printer
+##    import os
+##    import sys
+##    import win32print
+##    printer_name = win32print.GetDefaultPrinter()
+##
+##    global CurrentDex
+##    #This will be the program for printing the cards to the screen
+##    #Curently this is a crappy system
+##
+##    #There will be 3 information blocks
+##    datablock1 = []
+##    if data.companyname != "":
+##        datablock1.append(data.companyname)
+##    if data.company2 != "":
+##        datablock1.append(data.company2)
+##
+##    datablock2 = [] #this block needs to handle name spacing better
+##    if data.firstname != "" or data.middlename != "" or data.lastname != "":
+##        datablock2.append(data.firstname + " " + data.middlename + " " + data.lastname)
+##    if data.title != "":
+##        datablock2.append(data.title)
+##    if data.website != "":
+##        datablock2.append(data.website)
+##
+##
+##    datablock3 = [] #Needs better number formatting in case of funky numbers
+##    if data.address1 != "":
+##        datablock3.append(data.address1)
+##    if data.address2 != "":
+##        datablock3.append(data.address2 + " " + data.country)
+##    if data.address3 != "":
+##        datablock3.append(data.address3)
+##    if data.phone != "":
+##        datablock3.append("P: (" + data.phone[0:3] + ") " + data.phone[3:6] + "-" + data.phone[6:])
+##    if data.mobile != "":
+##        datablock3.append("M: (" + data.mobile[0:3] + ") " + data.mobile[3:6] + "-" + data.mobile[6:])
+##    if data.fax != "":
+##        datablock3.append("F: (" + data.fax[0:3] + ") " + data.fax[3:6] + "-" + data.fax[6:])
+##    if data.othernumber != "":
+##        datablock3.append("O: (" + data.othernumber[0:3] + ") " + data.othernumber[3:6] + "-" + data.othernumber[6:])
+##    if data.email != "":
+##        datablock3.append(data.email)
+##    
+##    #this assembles the card
+##    printedcard = []
+##    printedcard.append(" " + "_" * 58)
+##    i = 0
+##    while i < len(datablock1):
+##        printedcard.append( "| " + datablock1[i] + " " * (57-len(datablock1[i])) + "|")
+##        i += 1
+##    bottomlines = max([len(datablock2),len(datablock3)])
+##    blanklines = 18 - bottomlines - len(printedcard)
+##    for i in range(blanklines):
+##        printedcard.append("|" + " " * 58 + "|")
+##    i = bottomlines - 1
+##    datablock2.reverse()    #This lets the program count down to the bottom edge
+##    datablock3.reverse()
+##    while i > -1:
+##        line = "| "
+##        characters = 0
+##        try:
+##            line += datablock2[i]
+##            characters += len(datablock2[i])
+##        except IndexError:
+##            pass
+##        try:
+##            characters += len(datablock3[i])
+##        except IndexError:
+##            pass
+##        line += " " * (56 - characters)
+##        try:
+##            line += datablock3[i]
+##        except IndexError:
+##            pass
+##        line += " |"
+##        printedcard.append(line)
+##        i -= 1
+##    printedcard.append("|" + "_" * 58 + "|")
+##
+##    card = ""
+##    for line in printedcard:
+##        card += line
+##
+##    raw_data = bytes(card, "utf-8")
+##    print(raw_data)
+##   hPrinter = win32print.OpenPrinter (printer_name)
+##   try:
+##       hJob = win32print.StartDocPrinter (hPrinter, 1, ("test of raw data", None, "RAW"))
+##       try:
+##           win32print.StartPagePrinter (hPrinter)
+##           win32print.WritePrinter (hPrinter, raw_data)
+##           win32print.EndPagePrinter (hPrinter)
+##       finally:
+##           win32print.EndDocPrinter (hPrinter)
+##   finally:
+##       win32print.ClosePrinter (hPrinter)
+
+
+
 def BrowseCards():
     global CurrentDex
     #This will bring the cards up sorted by different methods
@@ -266,7 +368,6 @@ def BrowseCards():
     if rand == False:
         for i in range(len(CurrentDex)):
             index.append(i)
-        print(index)
     else:
         for item in CurrentDex:
             while True:     #creates a random non-repeating index
@@ -274,11 +375,6 @@ def BrowseCards():
                 if not i in index:
                     index.append(i)
                     break
-        RandDex = []
-        for i in index:
-           RandDex.append(CurrentDex[i])
-        CurrentDex = RandDex
-    print(index)
     #After sorting need to display
     #need to know new index to modify CurrentDex
     i = 0
@@ -291,6 +387,8 @@ def BrowseCards():
         elif "CHANGE" in response.upper() or "MODIFY" in response.upper():
             ModifyCard(CurrentDex[index[i]])
             SaveData()
+        #elif "PRINT" in response.upper():
+            #PrintPrint(CurrentDex[index[i]])
         i += 1
 
 def ModifyCard(data):
@@ -365,6 +463,10 @@ def ModifyCard(data):
             site = input("What is their website?\n>>> ")
             if site != "":
                 data.website = site
+        elif "COMMEN" in response.upper():
+            comment = input("What are your comments for this card?\n>>> ")
+            if comment != "":
+                data.comment = comment
         elif "XIT" in response.upper():
             break
         else:
