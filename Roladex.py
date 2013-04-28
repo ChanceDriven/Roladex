@@ -128,10 +128,12 @@ def PrintCard(data):
     datablock3 = [] #Needs better number formatting in case of funky numbers
     if data.address1 != "":
         datablock3.append(data.address1)
-    if data.address2 != "":
+    if data.address2 != "" and data.address3 == "":
         datablock3.append(data.address2 + " " + data.country)
+    elif data.address2 != "":
+        datablock3.append(data.address2)
     if data.address3 != "":
-        datablock3.append(data.address3)
+        datablock3.append(data.address3 + " " + data.country)
     if data.phone != "":
         datablock3.append("P: (" + data.phone[0:3] + ") " + data.phone[3:6] + "-" + data.phone[6:])
     if data.mobile != "":
@@ -534,7 +536,7 @@ except FileNotFoundError:
 
 
 #Version info
-print("\n" * 40 + "CardSmarts version 0.5 by Robert Rodriguez 4/15/2013\nReleased xx/xx/xxxx")
+print("\n" * 40 + "CardSmarts version 0.5 by Robert Rodriguez 4/15/2013\nReleased xx/xx/xxxx" + "\n" * 22)
 time.sleep(2)
 #Main program loop (it's tiny!)
 while True:
